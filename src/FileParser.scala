@@ -1,5 +1,9 @@
 import scala.meta._
-case class ScalaFile(imports: List[String], classes: List[ClassInfo], packageName: Option[String] = None) 
+case class ScalaFile(
+    imports: List[String],
+    classes: List[ClassInfo],
+    packageName: Option[String] = None
+)
 case class Annotation(name: String, args: List[String])
 case class Field(name: String, tpe: String, default: Option[String])
 case class ClassInfo(
@@ -7,8 +11,8 @@ case class ClassInfo(
     fields: List[Field],
     annotations: List[Annotation] = List.empty
 ) {
-    override def toString = 
-        s"""|Class: $name
+  override def toString =
+    s"""|Class: $name
             |Fields: ${fields.mkString("\n")}
             |Annotations: ${annotations.mkString("\n")}
             |""".stripMargin
@@ -35,8 +39,8 @@ object FileParser {
           ),
           c.mods
             .flatMap(_.children)
-            .map{
-                case Init(tpe, name, args) => Annotation(tpe.toString, args.flatten.map(_.toString))
+            .map { case Init(tpe, name, args) =>
+              Annotation(tpe.toString, args.flatten.map(_.toString))
             }
         ))
       )
@@ -47,9 +51,9 @@ object FileParser {
     )
   }
   def fromPathToClassDef(filePath: String): ScalaFile = {
-  val path = java.nio.file.Paths.get(filePath)
-  val bytes = java.nio.file.Files.readAllBytes(path)
-  val text = new String(bytes, "UTF-8")
-  parse(text)
+    val path = java.nio.file.Paths.get(filePath)
+    val bytes = java.nio.file.Files.readAllBytes(path)
+    val text = new String(bytes, "UTF-8")
+    parse(text)
   }
 }

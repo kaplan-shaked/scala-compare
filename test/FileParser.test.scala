@@ -1,11 +1,15 @@
 class FileParserTest extends munit.FunSuite {
   test("should parse file correctly") {
     // read test.scala_test from resources
-    val file = Thread.currentThread().getContextClassLoader.getResource("test.scala_test").getPath
+    val file = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("test.scala_test")
+      .getPath
     val parsedFile = FileParser.fromPathToClassDef(file)
     assert(parsedFile.classes.length == 5)
     assert(parsedFile.classes(0).name == "TestClass1")
-    //assert fields parse correctly
+    // assert fields parse correctly
     assert(parsedFile.classes(0).fields(0).name == "field1")
     assert(parsedFile.classes(0).fields(0).tpe == "String")
     assert(parsedFile.classes(0).fields(0).default.isEmpty)
