@@ -1,0 +1,24 @@
+
+
+import java.io.Serializable
+
+@Serializable
+case class TestClass1(field1: String, field2: Int){
+
+}
+
+@SomeAnnotation
+case class TestClass2(val field3: Double = 0.0, var field4: Boolean = false) {
+
+}
+
+case class TestClass3(field5: Long, field6: Float){
+
+}
+
+case class TestClass4(field7: String, field8: Int)
+
+@deriving(SomeAnnotation, SomeOtherAnnotation, Reader, Writer)
+case class TestClass5(field9: Double, field10: Boolean = true){
+
+}

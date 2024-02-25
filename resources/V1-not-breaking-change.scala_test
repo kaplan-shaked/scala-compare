@@ -1,0 +1,4 @@
+@deriving(ResourceWriter)
+case class TestClass3(field5: Long, field6: Float, field8: String = shaked){
+
+}
