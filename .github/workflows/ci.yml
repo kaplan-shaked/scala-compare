@@ -16,3 +16,7 @@ jobs:
         with:
           OLD_FILE: 'resources/v1.scala_test'
           NEW_FILE: 'resources/V1-breaking-change.scala_test'
+        continue-on-error: true
+      - name: Check on failures
+        if: (${{ success() }} || ${{ failure() }}) && (${{ steps.test-gh-action.outcome }} !== 'failure' )
+        run: exit 1

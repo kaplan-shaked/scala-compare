@@ -20,11 +20,7 @@ object CompareApp extends App {
 
   if (compared.find(_.isBreakingChange).isEmpty) {
     val output = "No breaking change detected"
-    // write output to environment variable GITHUB_OUTPUT
-    Files.write(
-      Paths.get(githubOutput),
-      output.getBytes(StandardCharsets.UTF_8)
-    )
+    println(output)
     System.exit(0)
   } else {
     val output =
@@ -33,11 +29,7 @@ object CompareApp extends App {
         compared.filter(_.isBreakingChange).map(_.toString)
       ).mkString("\n")
 
-    Files.write(
-      Paths.get(githubOutput),
-      output.getBytes(StandardCharsets.UTF_8)
-    )
-
+    println(output)
     System.exit(1)
   }
 
