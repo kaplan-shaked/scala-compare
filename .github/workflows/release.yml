@@ -34,7 +34,14 @@ jobs:
       # build with docker with scala-cli
       - name: Build
         run: |
-          scala-cli --power package --docker . --docker-image-repository ghcr.io/${{ github.repository }}:latest
+          scala-cli --power package --docker . --docker-image-repository ghcr.io/${{ github.repository }}
+      # login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # publish to GitHub Container Registry
       - name: Publish
         run: |
