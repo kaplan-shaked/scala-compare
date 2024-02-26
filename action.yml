@@ -7,6 +7,9 @@ inputs:
   new_file:
     description: "The path to the new version of the file"
     required: true
+outputs:
+  result:
+    description: "true/false if there are breaking changes"
 runs:
   using: "docker"
   image: "docker://ghcr.io/kaplan-shaked/scala-compare:latest"

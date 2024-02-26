@@ -2,7 +2,9 @@
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
 object CompareApp extends App {
-
+  private def writeResult(result: Boolean, githubOutput: String): Unit = {
+    Files.write(Paths.get(githubOutput), s"result=${result}".getBytes(StandardCharsets.UTF_8))
+  }
   // get path from environment variable
   val oldFile = sys.env("INPUT_OLD_FILE")
 
@@ -20,17 +22,17 @@ object CompareApp extends App {
 
   if (compared.find(_.isBreakingChange).isEmpty) {
     val output = "No breaking change detected"
+    // write false to environment variable GITHUB_OUTPUT
+    writeResult(false, githubOutput)
     println(output)
-    System.exit(0)
   } else {
     val output =
       List(
         "Breaking change detected",
         compared.filter(_.isBreakingChange).map(_.toString)
       ).mkString("\n")
-
+    writeResult(true, githubOutput)
     println(output)
-    System.exit(1)
-  }
-
+    }
+    System.exit(0)
 }
