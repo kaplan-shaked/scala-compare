@@ -14,5 +14,5 @@ jobs:
       - uses: ./
         id: test-gh-action
         with:
-          OLD_FILE: 'resource/V1.scala_test'
-          NEW_FILE: 'resource/V1-breaking-change.scala_test'
+          OLD_FILE: 'resources/v1.scala_test'
+          NEW_FILE: 'resources/V1-breaking-change.scala_test'
