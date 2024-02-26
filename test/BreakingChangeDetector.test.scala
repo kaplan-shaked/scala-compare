@@ -100,4 +100,5 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
       compared.find(_.isBreakingChange).isEmpty
     )
   }
+  
 }

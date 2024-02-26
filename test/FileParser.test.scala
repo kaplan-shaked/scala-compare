@@ -44,4 +44,5 @@ class FileParserTest extends munit.FunSuite {
     assert(parsedFile.classes(4).fields(1).tpe == "Boolean")
     assert(parsedFile.classes(4).fields(1).default.contains("true"))
   }
+
 }

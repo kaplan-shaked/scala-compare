@@ -18,15 +18,29 @@ case class ClassInfo(
             |""".stripMargin
 }
 
+
 object FileParser {
+  def praseTreeImport(tree: Tree): List[String] = {
+    tree.children.collect {
+      case i: Importer => List(i.toString)
+      case x => praseTreeImport(x)
+    }
+  }.flatten
+
+  def parseTreeClasses(classes: Tree) : List[Defn.Class] = {
+    classes.children.collect {
+      case c: Defn.Class => List(c)
+      case x => parseTreeClasses(x)
+    }.flatten
+  }
+
+
   def parse(content: String): ScalaFile = {
     val input = Input.String(content)
     val exampleTree: Source = input.parse[Source].get
-
-    val tree = exampleTree.children
-      .collect { case c: Defn.Class =>
-        c
-      }
+    
+    val tree = 
+      parseTreeClasses(exampleTree)
       .map(c =>
         (ClassInfo(
           c.name.value,
@@ -45,7 +59,7 @@ object FileParser {
         ))
       )
     ScalaFile(
-      exampleTree.children.collect { case i: Importer => i.toString },
+      praseTreeImport(exampleTree),
       tree,
       exampleTree.children.collectFirst { case p: Pkg => p.ref.toString }
     )
