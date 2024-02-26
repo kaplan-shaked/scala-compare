@@ -4,10 +4,10 @@ import java.nio.charset.StandardCharsets
 object CompareApp extends App {
 
   // get path from environment variable
-  val oldFile = sys.env("OLD_FILE")
+  val oldFile = sys.env("INPUT_OLD_FILE")
 
   // get path from environment variable
-  val newFile = sys.env("NEW_FILE")
+  val newFile = sys.env("INPUT_NEW_FILE")
 
   // read environment variable GITHUB_OUTPUT
   val githubOutput = sys.env("GITHUB_OUTPUT")
