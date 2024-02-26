@@ -1,8 +1,16 @@
 // receive 2 file paths as input and compare the files, exit with status code 0 if there was no breaking change, 1 otherwise
+import java.nio.file.{Paths, Files}
+import java.nio.charset.StandardCharsets
 object CompareApp extends App {
 
-  val oldFile = args(0)
-  val newFile = args(1)
+  // get path from environment variable
+  val oldFile = sys.env("OLD_FILE")
+
+  // get path from environment variable
+  val newFile = sys.env("NEW_FILE")
+
+  // read environment variable GITHUB_OUTPUT
+  val githubOutput = sys.env("GITHUB_OUTPUT")
 
   val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
   val newFileParsed = FileParser.fromPathToClassDef(newFile)
@@ -11,11 +19,25 @@ object CompareApp extends App {
     BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
 
   if (compared.find(_.isBreakingChange).isEmpty) {
-    println("No breaking change detected")
+    val output = "No breaking change detected"
+    // write output to environment variable GITHUB_OUTPUT
+    Files.write(
+      Paths.get(githubOutput),
+      output.getBytes(StandardCharsets.UTF_8)
+    )
     System.exit(0)
   } else {
-    println("Breaking change detected")
-    compared.filter(_.isBreakingChange).foreach(println)
+    val output =
+      List(
+        "Breaking change detected",
+        compared.filter(_.isBreakingChange).map(_.toString)
+      ).mkString("\n")
+
+    Files.write(
+      Paths.get(githubOutput),
+      output.getBytes(StandardCharsets.UTF_8)
+    )
+
     System.exit(1)
   }
 

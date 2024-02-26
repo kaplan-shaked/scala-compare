@@ -1,0 +1,12 @@
+name: "Scala breaking changes detector"
+description: "Detects breaking changes in Scala code"
+inputs:
+  old_file:
+    description: "The path to the old version of the file"
+    required: true
+  new_file:
+    description: "The path to the new version of the file"
+    required: true
+runs:
+  using: "docker"
+  image: "docker://ghcr.io/kaplan-shaked/scala-compare:latest"

@@ -1,0 +1,18 @@
+name: Continuos Integration
+on:
+  pull_request:
+    branches: ['**']
+  push:
+    branches: ['**', '!update/**', '!pr/**']
+
+jobs:
+
+  test-action-itself:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        id: test-gh-action
+        with:
+          old_file: 'resource/V1.scala_test'
+          new_file: 'resource/V1-breaking-change.scala_test'
