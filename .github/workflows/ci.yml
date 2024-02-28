@@ -14,8 +14,7 @@ jobs:
       - uses: ./
         id: test-gh-action
         with:
-          OLD_FILE: 'resources/v1.scala_test'
-          NEW_FILE: 'resources/V1-breaking-change.scala_test'
+          files: 'resources/v1.scala_test,ci_test_file2.scala_test'
       - name: Check on failures
         if: ${{ steps.test-gh-action.outputs.result }} == 'true'
         run: exit 0

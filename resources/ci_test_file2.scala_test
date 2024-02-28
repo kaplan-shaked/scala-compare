@@ -1,0 +1,7 @@
+import java.io.Serializable
+
+
+@deriving(ResourceWriter)
+case class TestClass3(field6: Float,field7: Double, field8: String) {
+
+}
