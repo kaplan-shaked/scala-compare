@@ -1,15 +1,15 @@
 name: "Scala breaking changes detector"
 description: "Detects breaking changes in Scala code"
 inputs:
-  old_file:
-    description: "The path to the old version of the file"
+  files:
+    description: "The files to compare <the previous version should be stored in the path suffix with .prev>"
     required: true
-  new_file:
-    description: "The path to the new version of the file"
-    required: true
+
 outputs:
   result:
     description: "true/false if there are breaking changes"
+  log:
+    description: "The log of the process"
 runs:
   using: "docker"
   image: "docker://ghcr.io/kaplan-shaked/scala-compare:latest"
