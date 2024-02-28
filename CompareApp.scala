@@ -47,11 +47,13 @@ object CompareApp extends App {
   val finalResult = result.map(_._1).reduce(_ || _)
   val finalOutput = result
     .map { case (_, output, file) =>
-      s"File: $file\n$output"
+      s"File: $file, res\n$output"
     }
     .mkString("\n")
 
   writeToOutput("result", finalResult.toString, githubOutput)
+  println("result=" + finalResult.toString)
   writeToOutput("log", finalResult.toString, githubOutput)
+  println("log=" + finalOutput)
   System.exit(0)
 }
