@@ -48,7 +48,7 @@ object CompareApp extends App {
   val finalResult = result.map(_._1).reduce(_ || _)
   val finalOutput = result
     .map { case (_, output, file) =>
-      s"File: $file, res\n$output"
+      s"File: $file $output"
     }
     .mkString("\n")
 
