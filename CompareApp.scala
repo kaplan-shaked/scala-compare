@@ -19,7 +19,7 @@ object CompareApp extends App {
 
   val filesList =
     sys.env("INPUT_FILES").split(",").filterNot(_.isBlank())
-  println(filesList.mkString(","))
+    
   // read environment variable GITHUB_OUTPUT
   val githubOutput = sys.env("GITHUB_OUTPUT")
   val result = filesList.map(file => (file, file + ".prev")).map {
@@ -48,7 +48,7 @@ object CompareApp extends App {
       }
     }
   }
-  val finalResult = result.map(_._1).reduce(_ || _)
+  val finalResult = result.map(_._1).foldLeft(false)(_ || _)
   // listOfFilesThatBreakChange
   val finalOutput = result.map(_._3).mkString(",")
 
