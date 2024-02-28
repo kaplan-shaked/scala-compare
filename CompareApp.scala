@@ -3,13 +3,14 @@ import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
 object CompareApp extends App {
   private def writeToOutput(
-      key: String,
-      value: String,
+      values: Map[String, String] = Map.empty[String, String],
       githubOutput: String
   ): Unit = {
     Files.write(
       Paths.get(githubOutput),
-      s"${key}=${value}".getBytes(StandardCharsets.UTF_8)
+      values.map { case (key, value) => s"$key=$value" }.mkString("\n").getBytes(
+        StandardCharsets.UTF_8
+      )
     )
   }
 
@@ -51,9 +52,12 @@ object CompareApp extends App {
     }
     .mkString("\n")
 
-  writeToOutput("result", finalResult.toString, githubOutput)
+  writeToOutput(Map(
+    "result" -> finalResult.toString,
+    "log" -> finalOutput
+  ), githubOutput)
+
   println("result=" + finalResult.toString)
-  writeToOutput("log", finalResult.toString, githubOutput)
   println("log=" + finalOutput)
   System.exit(0)
 }
