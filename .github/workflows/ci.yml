@@ -16,5 +16,14 @@ jobs:
         with:
           files: 'resources/ci_test_file.scala_test,resources/ci_test_file2.scala_test'
       - name: Check on failures
-        if: ${{ steps.test-gh-action.outputs.result }} == 'true'
-        run: exit 0
+        run: |
+          echo "Result: ${{ steps.test-gh-action.outputs.result }}"
+          if [ ${{ steps.test-gh-action.outputs.result }} == 'false' ]; then
+            echo "Test failed"
+            exit 1
+          else
+            echo "Test passed"
+            exit 0
+          fi
+
+      
