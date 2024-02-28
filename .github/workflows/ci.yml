@@ -18,6 +18,7 @@ jobs:
       - name: Check on failures
         run: |
           echo "Result: ${{ steps.test-gh-action.outputs.result }}"
+          echo "log: ${{ steps.test-gh-action.outputs.log }}"
           if [ ${{ steps.test-gh-action.outputs.result }} == 'false' ]; then
             echo "Test failed"
             exit 1
