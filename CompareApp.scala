@@ -8,18 +8,21 @@ object CompareApp extends App {
   ): Unit = {
     Files.write(
       Paths.get(githubOutput),
-      values.map { case (key, value) => s"$key=$value" }.mkString("\n").getBytes(
-        StandardCharsets.UTF_8
-      )
+      values
+        .map { case (key, value) => s"$key=$value" }
+        .mkString("\n")
+        .getBytes(
+          StandardCharsets.UTF_8
+        )
     )
   }
 
   val filesList =
-    sys.env("INPUT_FILES").split(",").map(file => (file, file + ".prev"))
-
+    sys.env("INPUT_FILES").split(",")
+  println(filesList.mkString(","))
   // read environment variable GITHUB_OUTPUT
   val githubOutput = sys.env("GITHUB_OUTPUT")
-  val result = filesList.map {
+  val result = filesList.map(file => (file, file + ".prev")).map {
     case (oldFile, newFile) => {
       val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
       val newFileParsed = FileParser.fromPathToClassDef(newFile)
@@ -48,12 +51,14 @@ object CompareApp extends App {
   val finalResult = result.map(_._1).reduce(_ || _)
   // listOfFilesThatBreakChange
   val finalOutput = result.map(_._3).mkString(",")
-    
 
-  writeToOutput(Map(
-    "result" -> finalResult.toString,
-    "log" -> finalOutput
-  ), githubOutput)
+  writeToOutput(
+    Map(
+      "result" -> finalResult.toString,
+      "log" -> finalOutput
+    ),
+    githubOutput
+  )
 
   println("result=" + finalResult.toString)
   println("log=" + finalOutput)
