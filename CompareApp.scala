@@ -51,7 +51,7 @@ object CompareApp extends App {
   }
   val finalResult = result.map(_._1).foldLeft(false)(_ || _)
   // listOfFilesThatBreakChange
-  val finalOutput = result.filterNot(_._1).map(_._3).mkString(",")
+  val finalOutput = result.filter(_._1).map(_._3).mkString(",")
 
   writeToOutput(
     Map(
