@@ -14,7 +14,7 @@ jobs:
       - uses: ./
         id: test-gh-action
         with:
-          files: 'resources/v1.scala_test,ci_test_file2.scala_test'
+          files: 'resources/ci_test_file.scala_test,resources/ci_test_file2.scala_test'
       - name: Check on failures
         if: ${{ steps.test-gh-action.outputs.result }} == 'true'
         run: exit 0
