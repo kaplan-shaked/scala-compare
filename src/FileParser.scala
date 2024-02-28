@@ -53,8 +53,9 @@ object FileParser {
           ),
           c.mods
             .flatMap(_.children)
-            .map { case Init(tpe, name, args) =>
-              Annotation(tpe.toString, args.flatten.map(_.toString))
+            .collect { 
+              case Init(tpe, name, args) =>
+                Annotation(tpe.toString, args.flatten.map(_.toString))
             }
         ))
       )
