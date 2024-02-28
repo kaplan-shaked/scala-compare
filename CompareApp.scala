@@ -18,7 +18,7 @@ object CompareApp extends App {
   }
 
   val filesList =
-    sys.env("INPUT_FILES").split(",")
+    sys.env("INPUT_FILES").split(",").filterNot(_.isBlank())
   println(filesList.mkString(","))
   // read environment variable GITHUB_OUTPUT
   val githubOutput = sys.env("GITHUB_OUTPUT")
