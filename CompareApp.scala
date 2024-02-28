@@ -43,6 +43,7 @@ object CompareApp extends App {
             "Breaking change detected",
             compared.filter(_.isBreakingChange).map(_.toString)
           ).mkString("\n")
+        println(output)
         (true, output, oldFile)
 
       }
