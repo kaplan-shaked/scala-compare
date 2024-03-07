@@ -10,6 +10,8 @@ outputs:
     description: "true/false if there are breaking changes"
   log:
     description: "The log of the process"
+  json:
+    description: "The json of detailed results"
 runs:
   using: "docker"
   image: "docker://ghcr.io/kaplan-shaked/scala-compare:latest"

@@ -59,7 +59,7 @@ object CompareApp extends App {
     ),
     githubOutput
   )
-
+  println("json=" + finalJson)
   println("result=" + finalResult.toString)
   println("log=" + finalOutput)
   System.exit(0)
