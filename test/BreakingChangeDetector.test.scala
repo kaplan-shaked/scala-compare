@@ -100,5 +100,46 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
       compared.find(_.isBreakingChange).isEmpty
     )
   }
-  
+
+  test("compare V4 with V4") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("V4.scala_test")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("V4.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).isEmpty
+    )
+  }
+
+  test("compare V5 breaking change") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("V5.scala_test")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("V5-breaking-change.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).nonEmpty
+    )
+  }
 }

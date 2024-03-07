@@ -1,0 +1,8 @@
+object shaked {
+    @deriving(ReadWriter)
+    case class Person(age: Int, gender: String)
+}
+object bla {
+    @deriving(ReadWriter)
+    case class Person(name: String)
+}

@@ -6,6 +6,8 @@ case class ScalaFile(
 )
 case class Annotation(name: String, args: List[String])
 case class Field(name: String, tpe: String, default: Option[String])
+
+
 case class ClassInfo(
     name: String,
     fields: List[Field],
@@ -34,6 +36,14 @@ object FileParser {
     }.flatten
   }
 
+  def addSuffixToDuplicates(list: List[ClassInfo]): List[ClassInfo] = {
+    var countMap = collection.mutable.Map[String, Int]().withDefaultValue(0)
+    list.map { c =>
+      val count = countMap(c.name)
+      countMap(c.name) += 1
+      if (count > 0) c.copy(name = s"${c.name}$count") else c
+    }
+  }
 
   def parse(content: String): ScalaFile = {
     val input = Input.String(content)
@@ -61,7 +71,7 @@ object FileParser {
       )
     ScalaFile(
       praseTreeImport(exampleTree),
-      tree,
+      addSuffixToDuplicates(tree),
       exampleTree.children.collectFirst { case p: Pkg => p.ref.toString }
     )
   }

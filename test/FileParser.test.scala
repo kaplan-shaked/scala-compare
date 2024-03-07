@@ -54,5 +54,13 @@ class FileParserTest extends munit.FunSuite {
       val parsedFile = FileParser.fromPathToClassDef(file)
       println(parsedFile)
   }
-
+  test("can parse V4") {
+    val file = Thread
+        .currentThread()
+        .getContextClassLoader
+        .getResource("V4.scala_test")
+        .getPath
+      val parsedFile = FileParser.fromPathToClassDef(file)
+      println(parsedFile)
+  }
 }
