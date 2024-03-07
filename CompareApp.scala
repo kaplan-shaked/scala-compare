@@ -1,6 +1,7 @@
 // receive 2 file paths as input and compare the files, exit with status code 0 if there was no breaking change, 1 otherwise
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
+import BreakingChangeDetector.CompareSummary._
 object CompareApp extends App {
   private def writeToOutput(
       values: Map[String, String] = Map.empty[String, String],
@@ -34,17 +35,13 @@ object CompareApp extends App {
         )
 
       if (compared.find(_.isBreakingChange).isEmpty) {
-        val output = "No breaking change detected"
+        val output = List.empty[BreakingChangeDetector.CompareSummary]
         // write false to environment variable GITHUB_OUTPUT
-        (false, output, oldFile)
+        (false, output, newFile)
       } else {
-        val output =
-          List(
-            "Breaking change detected",
-            compared.filter(_.isBreakingChange).map(_.toString)
-          ).mkString("\n")
+        val output = compared.filter(_.isBreakingChange)
         println(output)
-        (true, output, oldFile)
+        (true, output, newFile)
 
       }
     }
@@ -52,11 +49,13 @@ object CompareApp extends App {
   val finalResult = result.map(_._1).foldLeft(false)(_ || _)
   // listOfFilesThatBreakChange
   val finalOutput = result.filter(_._1).map(_._3).mkString(",")
-
+  val finalRaw = result.filter(_._1).map(res => (res._3, res._2)).toMap
+  val finalJson = upickle.default.write(finalRaw)
   writeToOutput(
     Map(
       "result" -> finalResult.toString,
-      "log" -> finalOutput
+      "log" -> finalOutput,
+      "json" ->finalJson
     ),
     githubOutput
   )

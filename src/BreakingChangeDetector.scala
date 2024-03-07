@@ -1,3 +1,6 @@
+import upickle.default._
+import ujson.Value
+
 object BreakingChangeDetector {
   case class CompareSummary(
       className: String,
@@ -9,8 +12,12 @@ object BreakingChangeDetector {
       s"className: ${className}, Removed fields: $removedFields, Added fields without default value: $addedFieldsWithoutDefaultValues, Changed deriving annotation: $changedDerivingAnnotation"
     def isBreakingChange: Boolean =
       removedFields.nonEmpty || addedFieldsWithoutDefaultValues.nonEmpty || changedDerivingAnnotation
+
   }
 
+  object CompareSummary {
+    implicit val rw: ReadWriter[CompareSummary] = macroRW
+  }
   val serializableClasses =
     List("Reader", "Writer", "ResourceReader", "ResourceWriter", "ReadWriter")
   /*
