@@ -23,7 +23,7 @@ object CompareApp extends App {
   // read environment variable GITHUB_OUTPUT
   val githubOutput = sys.env("GITHUB_OUTPUT")
   val result = filesList.map(file => (file, file + ".prev")).map {
-    case (oldFile, newFile) => {
+    case (newFile, oldFile) => {
       val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
       val newFileParsed = FileParser.fromPathToClassDef(newFile)
 
