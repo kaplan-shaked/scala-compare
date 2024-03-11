@@ -80,6 +80,11 @@ object BreakingChangeDetector {
           .exists(newAnnotation =>
             newAnnotation.args.contains(oldAnnotation.args)
           )
-      )
+      ) &&
+      !(oldClass.annotations
+        .filter(_.name == "deriving")
+        .flatMap(_.args)
+        .filter(x => serializableClasses.contains(x))
+        .length == 0)
 
 }
