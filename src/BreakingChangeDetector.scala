@@ -6,12 +6,13 @@ object BreakingChangeDetector {
       className: String,
       removedFields: List[String],
       addedFieldsWithoutDefaultValues: List[String],
-      changedDerivingAnnotation: Boolean
+      changedDerivingAnnotation: Boolean,
+      fieldsWithDefaultValuesThatWasRemoved: List[String] = List.empty
   ) {
     override def toString: String =
-      s"className: ${className}, Removed fields: $removedFields, Added fields without default value: $addedFieldsWithoutDefaultValues, Changed deriving annotation: $changedDerivingAnnotation"
+      s"className: ${className}, Removed fields: $removedFields, Added fields without default value: $addedFieldsWithoutDefaultValues, Changed deriving annotation: $changedDerivingAnnotation, Fields with default values that was removed: $fieldsWithDefaultValuesThatWasRemoved"
     def isBreakingChange: Boolean =
-      removedFields.nonEmpty || addedFieldsWithoutDefaultValues.nonEmpty || changedDerivingAnnotation
+      removedFields.nonEmpty || addedFieldsWithoutDefaultValues.nonEmpty || changedDerivingAnnotation || fieldsWithDefaultValuesThatWasRemoved.nonEmpty
 
   }
 
@@ -37,7 +38,8 @@ object BreakingChangeDetector {
               oldClass.name,
               listOfRemovedFields(oldClass, newClass),
               listOfAddedFieldsWithoutDefaultValue(oldClass, newClass),
-              checkIfDerivingAnnotationWasChanged(oldClass, newClass)
+              checkIfDerivingAnnotationWasChanged(oldClass, newClass),
+              listOfFieldsThatDefaultValueWasRemoved(oldClass, newClass)
             )
           )
       )
@@ -67,7 +69,17 @@ object BreakingChangeDetector {
     classInfo.annotations.exists(x =>
       x.name == "deriving" && x.args.find(initArgs.contains).isDefined
     )
-
+  private def listOfFieldsThatDefaultValueWasRemoved(
+      oldClass: ClassInfo,
+      newClass: ClassInfo
+  ): List[String] = oldClass.fields.filter(
+    oldField =>
+      newClass.fields.exists(
+        newField =>
+          oldField.name == newField.name && oldField.default.isDefined && newField.default.isEmpty
+      )
+  ).map(_.name)
+    
   private def checkIfDerivingAnnotationWasChanged(
       oldClass: ClassInfo,
       newClass: ClassInfo

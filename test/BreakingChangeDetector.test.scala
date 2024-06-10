@@ -163,4 +163,25 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
       compared.find(_.isBreakingChange).isEmpty
     )
   }
+
+  test("Shoud dectect breaking change when default value is dropped from a field") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("V7.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("V7.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).nonEmpty
+    )
+  }
 }
