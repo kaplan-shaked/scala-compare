@@ -7,12 +7,13 @@ object BreakingChangeDetector {
       removedFields: List[String],
       addedFieldsWithoutDefaultValues: List[String],
       changedDerivingAnnotation: Boolean,
-      fieldsWithDefaultValuesThatWasRemoved: List[String] = List.empty
+      fieldsWithDefaultValuesThatWasRemoved: List[String] = List.empty,
+      fieldsThatDefaultValueWasAddedToThem: List[String] = List.empty
   ) {
     override def toString: String =
       s"className: ${className}, Removed fields: $removedFields, Added fields without default value: $addedFieldsWithoutDefaultValues, Changed deriving annotation: $changedDerivingAnnotation, Fields with default values that was removed: $fieldsWithDefaultValuesThatWasRemoved"
     def isBreakingChange: Boolean =
-      removedFields.nonEmpty || addedFieldsWithoutDefaultValues.nonEmpty || changedDerivingAnnotation || fieldsWithDefaultValuesThatWasRemoved.nonEmpty
+      removedFields.nonEmpty || addedFieldsWithoutDefaultValues.nonEmpty || changedDerivingAnnotation || fieldsWithDefaultValuesThatWasRemoved.nonEmpty || fieldsThatDefaultValueWasAddedToThem.nonEmpty
 
   }
 
@@ -39,7 +40,8 @@ object BreakingChangeDetector {
               listOfRemovedFields(oldClass, newClass),
               listOfAddedFieldsWithoutDefaultValue(oldClass, newClass),
               checkIfDerivingAnnotationWasChanged(oldClass, newClass),
-              listOfFieldsThatDefaultValueWasRemoved(oldClass, newClass)
+              listOfFieldsThatDefaultValueWasRemoved(oldClass, newClass),
+              listOfFieldsThatDefaultValueWasAdded(oldClass, newClass)
             )
           )
       )
@@ -69,6 +71,17 @@ object BreakingChangeDetector {
     classInfo.annotations.exists(x =>
       x.name == "deriving" && x.args.find(initArgs.contains).isDefined
     )
+  private def listOfFieldsThatDefaultValueWasAdded(
+      oldClass: ClassInfo,
+      newClass: ClassInfo
+  ): List[String] = newClass.fields.filter(
+    newField =>
+      oldClass.fields.exists(
+        oldField =>
+          oldField.name == newField.name && oldField.default.isEmpty && newField.default.isDefined
+      )
+  ).map(_.name)
+
   private def listOfFieldsThatDefaultValueWasRemoved(
       oldClass: ClassInfo,
       newClass: ClassInfo

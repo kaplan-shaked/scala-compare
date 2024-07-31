@@ -1,0 +1,3 @@
+result=true
+log=resources/V8.scala_test
+json={"resources/V8.scala_test":[{"className":"User","removedFields":[],"addedFieldsWithoutDefaultValues":[],"changedDerivingAnnotation":false,"fieldsThatDefaultValueWasAddedToThem":["role"]}]}
