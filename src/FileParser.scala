@@ -1,5 +1,5 @@
 import scala.meta._
-import scala.meta.internal.parsers.ScalametaParser
+
 case class ScalaFile(
     imports: List[String],
     classes: List[ClassInfo],
