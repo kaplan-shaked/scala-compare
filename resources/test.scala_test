@@ -1,10 +1,11 @@
 
 
 import java.io.Serializable
+import scala.io.Source as src
 
 @Serializable
 case class TestClass1(field1: String, field2: Int){
-
+  src.DefaultBufSize.toString
 }
 
 @SomeAnnotation
