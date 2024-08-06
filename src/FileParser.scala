@@ -1,4 +1,5 @@
 import scala.meta._
+import scala.meta.internal.parsers.ScalametaParser
 case class ScalaFile(
     imports: List[String],
     classes: List[ClassInfo],
@@ -47,7 +48,8 @@ object FileParser {
 
   def parse(content: String): ScalaFile = {
     val input = Input.String(content)
-    val exampleTree: Source = input.parse[Source].get
+    val dialect = dialects.Scala213Source3
+    val exampleTree: Source = dialect(input).parse[Source].get
     
     val tree = 
       parseTreeClasses(exampleTree)
