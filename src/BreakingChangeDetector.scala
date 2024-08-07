@@ -74,25 +74,25 @@ object BreakingChangeDetector {
   private def listOfFieldsThatDefaultValueWasAdded(
       oldClass: ClassInfo,
       newClass: ClassInfo
-  ): List[String] = newClass.fields.filter(
-    newField =>
-      oldClass.fields.exists(
-        oldField =>
-          oldField.name == newField.name && oldField.default.isEmpty && newField.default.isDefined
+  ): List[String] = newClass.fields
+    .filter(newField =>
+      oldClass.fields.exists(oldField =>
+        oldField.name == newField.name && oldField.default.isEmpty && newField.default.isDefined
       )
-  ).map(_.name)
+    )
+    .map(_.name)
 
   private def listOfFieldsThatDefaultValueWasRemoved(
       oldClass: ClassInfo,
       newClass: ClassInfo
-  ): List[String] = oldClass.fields.filter(
-    oldField =>
-      newClass.fields.exists(
-        newField =>
-          oldField.name == newField.name && oldField.default.isDefined && newField.default.isEmpty
+  ): List[String] = oldClass.fields
+    .filter(oldField =>
+      newClass.fields.exists(newField =>
+        oldField.name == newField.name && oldField.default.isDefined && newField.default.isEmpty
       )
-  ).map(_.name)
-    
+    )
+    .map(_.name)
+
   private def checkIfDerivingAnnotationWasChanged(
       oldClass: ClassInfo,
       newClass: ClassInfo
