@@ -8,7 +8,6 @@ case class ScalaFile(
 case class Annotation(name: String, args: List[String])
 case class Field(name: String, tpe: String, default: Option[String])
 
-
 case class ClassInfo(
     name: String,
     fields: List[Field],
@@ -21,19 +20,18 @@ case class ClassInfo(
             |""".stripMargin
 }
 
-
 object FileParser {
   def praseTreeImport(tree: Tree): List[String] = {
     tree.children.collect {
       case i: Importer => List(i.toString)
-      case x => praseTreeImport(x)
+      case x           => praseTreeImport(x)
     }
   }.flatten
 
-  def parseTreeClasses(classes: Tree) : List[Defn.Class] = {
+  def parseTreeClasses(classes: Tree): List[Defn.Class] = {
     classes.children.collect {
       case c: Defn.Class => List(c)
-      case x => parseTreeClasses(x)
+      case x             => parseTreeClasses(x)
     }.flatten
   }
 
@@ -50,27 +48,26 @@ object FileParser {
     val input = Input.String(content)
     val dialect = dialects.Scala213Source3
     val exampleTree: Source = dialect(input).parse[Source].get
-    
-    val tree = 
+
+    val tree =
       parseTreeClasses(exampleTree)
-      .map(c =>
-        (ClassInfo(
-          c.name.value,
-          c.ctor.paramss.flatten.map(p =>
-            Field(
-              p.name.value,
-              p.decltpe.get.toString,
-              p.default.map(_.toString)
-            )
-          ),
-          c.mods
-            .flatMap(_.children)
-            .collect { 
-              case Init(tpe, name, args) =>
+        .map(c =>
+          (ClassInfo(
+            c.name.value,
+            c.ctor.paramss.flatten.map(p =>
+              Field(
+                p.name.value,
+                p.decltpe.get.toString,
+                p.default.map(_.toString)
+              )
+            ),
+            c.mods
+              .flatMap(_.children)
+              .collect { case Init(tpe, name, args) =>
                 Annotation(tpe.toString, args.flatten.map(_.toString))
-            }
-        ))
-      )
+              }
+          ))
+        )
     ScalaFile(
       praseTreeImport(exampleTree),
       addSuffixToDuplicates(tree),

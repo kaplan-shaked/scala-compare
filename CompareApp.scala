@@ -20,7 +20,7 @@ object CompareApp extends App {
 
   val filesList =
     sys.env("INPUT_FILES").split(",").filterNot(_.isBlank())
-    
+
   // read environment variable GITHUB_OUTPUT
   val githubOutput = sys.env("GITHUB_OUTPUT")
   val result = filesList.map(file => (file, file + ".prev")).map {
@@ -55,7 +55,7 @@ object CompareApp extends App {
     Map(
       "result" -> finalResult.toString,
       "log" -> finalOutput,
-      "json" ->finalJson
+      "json" -> finalJson
     ),
     githubOutput
   )
