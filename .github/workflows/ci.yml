@@ -27,4 +27,10 @@ jobs:
             exit 0
           fi
 
-      
+  run-scala-cli-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: VirtusLab/scala-cli-setup@main
+      - name: Run tests
+        run: scala-cli test .
