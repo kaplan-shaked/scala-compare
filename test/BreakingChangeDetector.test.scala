@@ -3,7 +3,7 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     val oldFile = Thread
       .currentThread()
       .getContextClassLoader
-      .getResource("V1.scala_test")
+      .getResource("v1.scala_test")
       .getPath
     val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
     val newFile = Thread
@@ -23,7 +23,7 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     val oldFile = Thread
       .currentThread()
       .getContextClassLoader
-      .getResource("V1.scala_test")
+      .getResource("v1.scala_test")
       .getPath
     val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
     val newFile = Thread
@@ -84,7 +84,7 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     val oldFile = Thread
       .currentThread()
       .getContextClassLoader
-      .getResource("V1.scala_test")
+      .getResource("v1.scala_test")
       .getPath
     val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
     val newFile = Thread
