@@ -96,20 +96,24 @@ object BreakingChangeDetector {
   private def checkIfDerivingAnnotationWasChanged(
       oldClass: ClassInfo,
       newClass: ClassInfo
-  ): Boolean =
-    oldClass.annotations
+  ): Boolean = {
+    val isOldClassContainsSerializable = !(oldClass.annotations
       .filter(_.name == "deriving")
-      .forall(oldAnnotation =>
-        newClass.annotations
-          .find(_.name == "deriving")
-          .exists(newAnnotation =>
-            newAnnotation.args.contains(oldAnnotation.args)
-          )
-      ) &&
-      !(oldClass.annotations
-        .filter(_.name == "deriving")
-        .flatMap(_.args)
-        .filter(x => serializableClasses.contains(x))
-        .length == 0)
+      .flatMap(_.args)
+      .filter(x => serializableClasses.contains(x))
+      .length == 0)
 
+    val oldClassDerivingAnnotations =
+      oldClass.annotations.filter(_.name == "deriving")
+    val newClassDerivingAnnotations =
+      newClass.annotations.find(_.name == "deriving")
+
+    isOldClassContainsSerializable &&
+    !oldClassDerivingAnnotations
+      .forall(oldAnnotation =>
+        newClassDerivingAnnotations.exists(newAnnotation => {
+          oldAnnotation.args.toSet.subsetOf(newAnnotation.args.toSet)
+        })
+      )
+  }
 }
