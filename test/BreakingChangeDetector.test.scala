@@ -227,4 +227,33 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
       compared.find(_.isBreakingChange).isEmpty
     )
   }
+
+  test("Should detect ReaderWriter changed to ResourceWriter, ResourceReader") {
+    def runWithFiles(olfFileName: String, newFileName: String) = {
+      val oldFile = Thread
+        .currentThread()
+        .getContextClassLoader
+        .getResource("V10.scala_test.prev")
+        .getPath
+      val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+      val newFile = Thread
+        .currentThread()
+        .getContextClassLoader
+        .getResource("V10.scala_test")
+        .getPath
+      val newFileParsed = FileParser.fromPathToClassDef(newFile)
+      val compared =
+        BreakingChangeDetector.detectBreakingChange(
+          oldFileParsed,
+          newFileParsed
+        )
+      println(compared)
+      assert(
+        compared.find(_.isBreakingChange).nonEmpty
+      )
+    }
+    
+    runWithFiles("V10.scala_test.prev", "V10.scala_test")
+    runWithFiles("V10.scala_test", "V10.scala_test.prev")
+  }
 }
