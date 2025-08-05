@@ -252,7 +252,7 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
         compared.find(_.isBreakingChange).nonEmpty
       )
     }
-    
+
     runWithFiles("V10.scala_test.prev", "V10.scala_test")
     runWithFiles("V10.scala_test", "V10.scala_test.prev")
   }
