@@ -63,4 +63,13 @@ class FileParserTest extends munit.FunSuite {
     val parsedFile = FileParser.fromPathToClassDef(file)
     println(parsedFile)
   }
+  test("uses Scala3 dialect for sources in scala-3 directory") {
+    val file = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/Scala3Class.scala_test")
+      .getPath
+    val parsedFile = FileParser.fromPathToClassDef(file)
+    assert(parsedFile.classes.head.name == "Scala3Class")
+  }
 }

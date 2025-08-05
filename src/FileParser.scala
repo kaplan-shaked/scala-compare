@@ -1,4 +1,5 @@
 import scala.meta._
+import scala.meta.Dialect
 
 case class ScalaFile(
     imports: List[String],
@@ -44,9 +45,8 @@ object FileParser {
     }
   }
 
-  def parse(content: String): ScalaFile = {
+  def parse(content: String, dialect: Dialect = dialects.Scala213Source3): ScalaFile = {
     val input = Input.String(content)
-    val dialect = dialects.Scala213Source3
     val exampleTree: Source = dialect(input).parse[Source].get
 
     val tree =
@@ -78,6 +78,10 @@ object FileParser {
     val path = java.nio.file.Paths.get(filePath)
     val bytes = java.nio.file.Files.readAllBytes(path)
     val text = new String(bytes, "UTF-8")
-    parse(text)
+    val dialect =
+      if (filePath.split(java.io.File.separator).contains("scala-3"))
+        dialects.Scala3
+      else dialects.Scala213Source3
+    parse(text, dialect)
   }
 }
