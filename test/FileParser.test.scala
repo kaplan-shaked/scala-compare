@@ -71,5 +71,24 @@ class FileParserTest extends munit.FunSuite {
       .getPath
     val parsedFile = FileParser.fromPathToClassDef(file)
     assert(parsedFile.classes.head.name == "Scala3Class")
+    // Assert only first param list is treated as fields (using params should be ignored)
+    assert(parsedFile.classes.head.fields.length == 1)
+    assert(parsedFile.classes.head.fields(0).name == "a")
+    assert(parsedFile.classes.head.fields(0).tpe == "Int")
+  }
+
+  test("parses Scala 3 derives annotation") {
+    val file = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/Scala3Derives.scala_test")
+      .getPath
+    val parsedFile = FileParser.fromPathToClassDef(file)
+    assert(parsedFile.classes.head.name == "Derives3")
+    assert(parsedFile.classes.head.fields.length == 1)
+    assert(parsedFile.classes.head.fields(0).name == "x")
+    val derivesAnnotation = parsedFile.classes.head.annotations.find(_.name == "derives")
+    assert(derivesAnnotation.isDefined)
+    assert(derivesAnnotation.get.args.contains("ReadWriter"))
   }
 }

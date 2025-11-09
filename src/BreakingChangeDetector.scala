@@ -69,7 +69,7 @@ object BreakingChangeDetector {
       initArgs: List[String]
   ): Boolean =
     classInfo.annotations.exists(x =>
-      x.name == "deriving" && x.args.find(initArgs.contains).isDefined
+      (x.name == "deriving" || x.name == "derives") && x.args.exists(initArgs.contains)
     )
   private def listOfFieldsThatDefaultValueWasAdded(
       oldClass: ClassInfo,
@@ -98,15 +98,15 @@ object BreakingChangeDetector {
       newClass: ClassInfo
   ): Boolean = {
     val isOldClassContainsSerializable = !(oldClass.annotations
-      .filter(_.name == "deriving")
+      .filter(x => x.name == "deriving" || x.name == "derives")
       .flatMap(_.args)
       .filter(x => serializableClasses.contains(x))
       .length == 0)
 
     val oldClassDerivingAnnotations =
-      oldClass.annotations.filter(_.name == "deriving")
+      oldClass.annotations.filter(x => x.name == "deriving" || x.name == "derives")
     val newClassDerivingAnnotations =
-      newClass.annotations.find(_.name == "deriving")
+      newClass.annotations.filter(x => x.name == "deriving" || x.name == "derives")
 
     isOldClassContainsSerializable &&
     !oldClassDerivingAnnotations
