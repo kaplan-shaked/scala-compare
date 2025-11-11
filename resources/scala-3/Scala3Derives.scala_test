@@ -1,0 +1,2 @@
+case class Derives3(x: Int) derives ReadWriter
+

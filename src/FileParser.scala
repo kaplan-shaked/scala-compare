@@ -54,23 +54,27 @@ object FileParser {
 
     val tree =
       parseTreeClasses(exampleTree)
-        .map(c =>
-          (ClassInfo(
+        .map(c => {
+          val derivingFromAnnotation =
+            c.mods
+              .flatMap(_.children)
+              .collect { case Init(tpe, _, args) =>
+                Annotation(tpe.toString, args.flatten.map(_.toString))
+              }
+          val derivingFromDerives =
+            c.templ.derives.map(d => Annotation("derives", List(d.toString)))
+          ClassInfo(
             c.name.value,
-            c.ctor.paramss.flatten.map(p =>
+            c.ctor.paramss.headOption.getOrElse(Nil).map(p =>
               Field(
                 p.name.value,
                 p.decltpe.get.toString,
                 p.default.map(_.toString)
               )
             ),
-            c.mods
-              .flatMap(_.children)
-              .collect { case Init(tpe, name, args) =>
-                Annotation(tpe.toString, args.flatten.map(_.toString))
-              }
-          ))
-        )
+            derivingFromAnnotation ++ derivingFromDerives
+          )
+        })
     ScalaFile(
       praseTreeImport(exampleTree),
       addSuffixToDuplicates(tree),
