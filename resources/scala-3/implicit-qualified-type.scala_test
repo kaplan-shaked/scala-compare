@@ -1,0 +1,5 @@
+final case class TestClass(
+  field1: String
+)
+
+implicit val rw: upickle.default.ReadWriter[TestClass] = upickle.default.Pickler.macroRW

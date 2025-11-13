@@ -1,0 +1,8 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class User(
+  id: Int,
+  name: String
+)
+
+implicit val rw: ReadWriter[User] = Pickler.macroRW
