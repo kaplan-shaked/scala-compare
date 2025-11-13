@@ -36,6 +36,30 @@ object FileParser {
     }.flatten
   }
 
+  /**
+   * Parse implicit val declarations from the AST.
+   * Returns a map from class name to serialization type (ReadWriter, Writer, Reader, etc.)
+   */
+  private def parseImplicitSerializationInstances(tree: Tree): Map[String, String] = {
+    def extractFromType(tpe: Type): Option[(String, String)] = tpe match {
+      case Type.Apply(Type.Name(serializationType), List(Type.Name(className))) =>
+        Some((className, serializationType))
+      case Type.Apply(Type.Select(_, Type.Name(serializationType)), List(Type.Name(className))) =>
+        Some((className, serializationType))
+      case _ => None
+    }
+
+    def collectImplicitVals(tree: Tree): List[(String, String)] = {
+      tree.children.flatMap {
+        case v: Defn.Val if v.mods.exists(_.isInstanceOf[Mod.Implicit]) =>
+          v.decltpe.flatMap(extractFromType).toList
+        case x => collectImplicitVals(x)
+      }
+    }
+
+    collectImplicitVals(tree).toMap
+  }
+
   def addSuffixToDuplicates(list: List[ClassInfo]): List[ClassInfo] = {
     var countMap = collection.mutable.Map[String, Int]().withDefaultValue(0)
     list.map { c =>
@@ -45,6 +69,34 @@ object FileParser {
     }
   }
 
+  /**
+   * Extract annotations from @deriving or derives syntax (old way)
+   */
+  private def extractDerivingAnnotations(classDef: Defn.Class): List[Annotation] = {
+    val derivingFromAnnotation =
+      classDef.mods
+        .flatMap(_.children)
+        .collect { case Init(tpe, _, args) =>
+          Annotation(tpe.toString, args.flatten.map(_.toString))
+        }
+    val derivingFromDerives =
+      classDef.templ.derives.map(d => Annotation("derives", List(d.toString)))
+    derivingFromAnnotation ++ derivingFromDerives
+  }
+
+  /**
+   * Extract annotations from implicit val instances (new way)
+   */
+  private def extractImplicitSerializationAnnotations(
+      className: String,
+      implicitInstances: Map[String, String]
+  ): List[Annotation] = {
+    implicitInstances
+      .get(className)
+      .map(serializationType => Annotation("implicit", List(serializationType)))
+      .toList
+  }
+
   def parse(
       content: String,
       dialect: Dialect = dialects.Scala213Source3
@@ -52,17 +104,15 @@ object FileParser {
     val input = Input.String(content)
     val exampleTree: Source = dialect(input).parse[Source].get
 
+    // Parse implicit serialization instances (new way)
+    val implicitInstances = parseImplicitSerializationInstances(exampleTree)
+
+    // Parse classes with their annotations (old way)
     val tree =
       parseTreeClasses(exampleTree)
         .map(c => {
-          val derivingFromAnnotation =
-            c.mods
-              .flatMap(_.children)
-              .collect { case Init(tpe, _, args) =>
-                Annotation(tpe.toString, args.flatten.map(_.toString))
-              }
-          val derivingFromDerives =
-            c.templ.derives.map(d => Annotation("derives", List(d.toString)))
+          val derivingAnnotations = extractDerivingAnnotations(c)
+          val implicitAnnotations = extractImplicitSerializationAnnotations(c.name.value, implicitInstances)
           ClassInfo(
             c.name.value,
             c.ctor.paramss.headOption.getOrElse(Nil).map(p =>
@@ -72,7 +122,7 @@ object FileParser {
                 p.default.map(_.toString)
               )
             ),
-            derivingFromAnnotation ++ derivingFromDerives
+            derivingAnnotations ++ implicitAnnotations
           )
         })
     ScalaFile(

@@ -30,7 +30,7 @@ object BreakingChangeDetector {
       newFile: ScalaFile
   ): List[CompareSummary] =
     newFile.classes
-      .filter(checkIfClassHasDerivingAnnotation(_, serializableClasses))
+      .filter(checkIfClassHasSerialization(_, serializableClasses))
       .map(newClass =>
         oldFile.classes
           .find(_.name == newClass.name)
@@ -39,7 +39,7 @@ object BreakingChangeDetector {
               oldClass.name,
               listOfRemovedFields(oldClass, newClass),
               listOfAddedFieldsWithoutDefaultValue(oldClass, newClass),
-              checkIfDerivingAnnotationWasChanged(oldClass, newClass),
+              checkIfSerializationWasChanged(oldClass, newClass),
               listOfFieldsThatDefaultValueWasRemoved(oldClass, newClass),
               listOfFieldsThatDefaultValueWasAdded(oldClass, newClass)
             )
@@ -64,6 +64,9 @@ object BreakingChangeDetector {
       .filter(_.default.isEmpty)
       .map(_.name)
 
+  /**
+   * Check if class has serialization via @deriving or derives (old way)
+   */
   private def checkIfClassHasDerivingAnnotation(
       classInfo: ClassInfo,
       initArgs: List[String]
@@ -71,6 +74,27 @@ object BreakingChangeDetector {
     classInfo.annotations.exists(x =>
       (x.name == "deriving" || x.name == "derives") && x.args.exists(initArgs.contains)
     )
+
+  /**
+   * Check if class has serialization via implicit val instances (new way)
+   */
+  private def checkIfClassHasImplicitSerialization(
+      classInfo: ClassInfo,
+      serializationTypes: List[String]
+  ): Boolean =
+    classInfo.annotations.exists(x =>
+      x.name == "implicit" && x.args.exists(serializationTypes.contains)
+    )
+
+  /**
+   * Check if class has serialization via either old or new way
+   */
+  private def checkIfClassHasSerialization(
+      classInfo: ClassInfo,
+      serializationTypes: List[String]
+  ): Boolean =
+    checkIfClassHasDerivingAnnotation(classInfo, serializationTypes) ||
+      checkIfClassHasImplicitSerialization(classInfo, serializationTypes)
   private def listOfFieldsThatDefaultValueWasAdded(
       oldClass: ClassInfo,
       newClass: ClassInfo
@@ -93,27 +117,52 @@ object BreakingChangeDetector {
     )
     .map(_.name)
 
-  private def checkIfDerivingAnnotationWasChanged(
+  /**
+   * Extract serialization types from annotations (old way: deriving/derives)
+   */
+  private def extractDerivingSerializationTypes(classInfo: ClassInfo): Set[String] = {
+    classInfo.annotations
+      .filter(x => x.name == "deriving" || x.name == "derives")
+      .flatMap(_.args)
+      .filter(serializableClasses.contains)
+      .toSet
+  }
+
+  /**
+   * Extract serialization types from implicit annotations (new way)
+   */
+  private def extractImplicitSerializationTypes(classInfo: ClassInfo): Set[String] = {
+    classInfo.annotations
+      .filter(_.name == "implicit")
+      .flatMap(_.args)
+      .filter(serializableClasses.contains)
+      .toSet
+  }
+
+  /**
+   * Get all serialization types (both old and new ways)
+   */
+  private def getAllSerializationTypes(classInfo: ClassInfo): Set[String] = {
+    extractDerivingSerializationTypes(classInfo) ++ extractImplicitSerializationTypes(classInfo)
+  }
+
+  /**
+   * Check if serialization was changed (handles both old and new ways, and migration between them)
+   */
+  private def checkIfSerializationWasChanged(
       oldClass: ClassInfo,
       newClass: ClassInfo
   ): Boolean = {
-    val isOldClassContainsSerializable = !(oldClass.annotations
-      .filter(x => x.name == "deriving" || x.name == "derives")
-      .flatMap(_.args)
-      .filter(x => serializableClasses.contains(x))
-      .length == 0)
+    val oldSerializationTypes = getAllSerializationTypes(oldClass)
+    val newSerializationTypes = getAllSerializationTypes(newClass)
 
-    val oldClassDerivingAnnotations =
-      oldClass.annotations.filter(x => x.name == "deriving" || x.name == "derives")
-    val newClassDerivingAnnotations =
-      newClass.annotations.filter(x => x.name == "deriving" || x.name == "derives")
-
-    isOldClassContainsSerializable &&
-    !oldClassDerivingAnnotations
-      .forall(oldAnnotation =>
-        newClassDerivingAnnotations.exists(newAnnotation => {
-          oldAnnotation.args.toSet.subsetOf(newAnnotation.args.toSet)
-        })
-      )
+    // If old class had serialization, check if it changed
+    if (oldSerializationTypes.nonEmpty) {
+      // Serialization types changed (e.g., ReadWriter -> Writer, or deriving -> implicit)
+      oldSerializationTypes != newSerializationTypes
+    } else {
+      // Old class didn't have serialization, so this is not a breaking change
+      false
+    }
   }
 }
