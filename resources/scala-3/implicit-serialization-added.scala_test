@@ -1,0 +1,8 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class ImplicitProfile(
+  id: Int,
+  name: String
+)
+
+implicit val implicitProfileRW: ReadWriter[ImplicitProfile] = Pickler.macroRW

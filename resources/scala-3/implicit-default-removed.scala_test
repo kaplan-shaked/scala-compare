@@ -1,0 +1,8 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class ImplicitSettings(
+  id: Int,
+  theme: String
+)
+
+implicit val implicitSettingsRW: ReadWriter[ImplicitSettings] = Pickler.macroRW

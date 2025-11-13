@@ -1,0 +1,8 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class ImplicitContact(
+  id: Int,
+  name: String
+)
+
+implicit val implicitContactRW: ReadWriter[ImplicitContact] = Pickler.macroRW
