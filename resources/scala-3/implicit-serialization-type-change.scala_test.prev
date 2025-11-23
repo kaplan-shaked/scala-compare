@@ -1,0 +1,8 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class ImplicitOrder(
+  id: String,
+  total: BigDecimal
+)
+
+implicit val implicitOrderRW: ReadWriter[ImplicitOrder] = Pickler.macroRW

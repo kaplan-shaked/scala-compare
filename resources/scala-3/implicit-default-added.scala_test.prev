@@ -1,0 +1,8 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class ImplicitAccount(
+  id: Int,
+  plan: String
+)
+
+implicit val implicitAccountRW: ReadWriter[ImplicitAccount] = Pickler.macroRW

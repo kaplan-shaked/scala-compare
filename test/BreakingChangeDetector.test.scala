@@ -256,4 +256,170 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     runWithFiles("V10.scala_test.prev", "V10.scala_test")
     runWithFiles("V10.scala_test", "V10.scala_test.prev")
   }
+
+  test("Should detect breaking change with implicit ReadWriter - added field without default") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-breaking-change.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-breaking-change.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).nonEmpty
+    )
+    val breakingChange = compared.find(_.isBreakingChange).get
+    assert(breakingChange.addedFieldsWithoutDefaultValues.contains("email"))
+  }
+
+  test("Implicit serialization - adding a field with a default value is not breaking") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-non-breaking-change.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-non-breaking-change.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).isEmpty
+    )
+  }
+
+  test("Implicit serialization - removing a field is a breaking change") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-removed-field.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-removed-field.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).nonEmpty
+    )
+    val breakingChange = compared.find(_.isBreakingChange).get
+    assert(breakingChange.removedFields.contains("email"))
+  }
+
+  test("Implicit serialization - adding implicit instance is not breaking change") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-serialization-added.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-serialization-added.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).isEmpty
+    )
+  }
+
+  test("Implicit serialization - removing default value is a breaking change") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-default-removed.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-default-removed.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).nonEmpty
+    )
+    val breakingChange = compared.find(_.isBreakingChange).get
+    assert(breakingChange.fieldsWithDefaultValuesThatWasRemoved.contains("theme"))
+  }
+
+  test("Implicit serialization - adding default value is a breaking change") {
+    val oldFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-default-added.scala_test.prev")
+      .getPath
+    val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+    val newFile = Thread
+      .currentThread()
+      .getContextClassLoader
+      .getResource("scala-3/implicit-default-added.scala_test")
+      .getPath
+    val newFileParsed = FileParser.fromPathToClassDef(newFile)
+    val compared =
+      BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+    println(compared)
+    assert(
+      compared.find(_.isBreakingChange).nonEmpty
+    )
+    val breakingChange = compared.find(_.isBreakingChange).get
+    assert(breakingChange.fieldsThatDefaultValueWasAddedToThem.contains("plan"))
+  }
+
+  test("Implicit serialization - changing serialization type is a breaking change") {
+    def runWithFiles(oldFileName: String, newFileName: String) = {
+      val oldFile = Thread
+        .currentThread()
+        .getContextClassLoader
+        .getResource(oldFileName)
+        .getPath
+      val oldFileParsed = FileParser.fromPathToClassDef(oldFile)
+      val newFile = Thread
+        .currentThread()
+        .getContextClassLoader
+        .getResource(newFileName)
+        .getPath
+      val newFileParsed = FileParser.fromPathToClassDef(newFile)
+      val compared =
+        BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+      println(compared)
+      assert(
+        compared.find(_.isBreakingChange).nonEmpty
+      )
+    }
+
+    runWithFiles(
+      "scala-3/implicit-serialization-type-change.scala_test.prev",
+      "scala-3/implicit-serialization-type-change.scala_test"
+    )
+    runWithFiles(
+      "scala-3/implicit-serialization-type-change.scala_test",
+      "scala-3/implicit-serialization-type-change.scala_test.prev"
+    )
+  }
 }

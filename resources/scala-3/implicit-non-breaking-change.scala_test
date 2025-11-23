@@ -1,0 +1,9 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class ImplicitUser(
+  id: Int,
+  name: String,
+  role: String = "user"
+)
+
+implicit val implicitUserRW: ReadWriter[ImplicitUser] = Pickler.macroRW

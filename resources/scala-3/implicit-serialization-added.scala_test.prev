@@ -1,0 +1,4 @@
+final case class ImplicitProfile(
+  id: Int,
+  name: String
+)

@@ -1,0 +1,36 @@
+import upickle.default.{ReadWriter, Pickler}
+
+final case class AchOriginationJobArgs(
+  cutoff: java.time.LocalTime,
+  timezone: java.time.ZoneId,
+  companyName: Option[String] = None
+)
+
+implicit val rw: ReadWriter[AchOriginationJobArgs] = Pickler.macroRW
+
+case class UserWithWriter(
+  id: Int,
+  name: String
+)
+
+implicit val writer: upickle.default.Writer[UserWithWriter] = Pickler.macroW
+
+case class ProductWithReader(
+  sku: String,
+  price: Double
+)
+
+implicit val reader: upickle.default.Reader[ProductWithReader] = Pickler.macroR
+
+case class OrderWithReadWriter(
+  orderId: String,
+  total: BigDecimal,
+  status: String = "pending"
+)
+
+implicit val orderRW: ReadWriter[OrderWithReadWriter] = Pickler.macroRW
+
+case class NotSerializable(
+  field1: String,
+  field2: Int
+)
