@@ -1,0 +1,5 @@
+//> using scala "3.7.1"
+//> using dep "org.scalameta::scalameta:4.13.9"
+//> using dep "com.lihaoyi::upickle::4.2.1"
+//> using test.dep "org.scalameta::munit::0.7.29"
+//> using resourceDir "./resources"
