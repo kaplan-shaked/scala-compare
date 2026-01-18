@@ -1,4 +1,4 @@
-import upickle.default._
+import upickle.default.*
 import ujson.Value
 
 object BreakingChangeDetector {

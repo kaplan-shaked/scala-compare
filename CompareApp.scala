@@ -1,14 +1,15 @@
 // receive 2 file paths as input and compare the files, exit with status code 0 if there was no breaking change, 1 otherwise
-//> using scala "2.13.16"
+//> using scala "3.7.1"
 //> using dep "org.scalameta::scalameta:4.13.9"
 //> using test.dep "org.scalameta::munit::0.7.29"
 //> using resourceDir "./resources"
 //> using dep "com.lihaoyi::upickle::4.2.1"
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
-import BreakingChangeDetector.CompareSummary._
-object CompareApp extends App {
-  private def writeToOutput(
+import BreakingChangeDetector.CompareSummary.*
+
+@main def compareApp(): Unit = {
+  def writeToOutput(
       values: Map[String, String] = Map.empty[String, String],
       githubOutput: String
   ): Unit = {
