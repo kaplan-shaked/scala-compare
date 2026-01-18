@@ -1,5 +1,5 @@
 // receive 2 file paths as input and compare the files, exit with status code 0 if there was no breaking change, 1 otherwise
-//> using scala "3.3.4"
+//> using scala "3.7.1"
 //> using dep "org.scalameta::scalameta:4.13.9"
 //> using test.dep "org.scalameta::munit::0.7.29"
 //> using resourceDir "./resources"

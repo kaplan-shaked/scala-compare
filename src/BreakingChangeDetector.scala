@@ -18,7 +18,7 @@ object BreakingChangeDetector {
   }
 
   object CompareSummary {
-    given ReadWriter[CompareSummary] = ReadWriter.derived[CompareSummary]
+    implicit val rw: ReadWriter[CompareSummary] = macroRW
   }
   val serializableClasses =
     List("Reader", "Writer", "ResourceReader", "ResourceWriter", "ReadWriter")
