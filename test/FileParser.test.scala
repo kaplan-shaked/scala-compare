@@ -87,7 +87,8 @@ class FileParserTest extends munit.FunSuite {
     assert(parsedFile.classes.head.name == "Derives3")
     assert(parsedFile.classes.head.fields.length == 1)
     assert(parsedFile.classes.head.fields(0).name == "x")
-    val derivesAnnotation = parsedFile.classes.head.annotations.find(_.name == "derives")
+    val derivesAnnotation =
+      parsedFile.classes.head.annotations.find(_.name == "derives")
     assert(derivesAnnotation.isDefined)
     assert(derivesAnnotation.get.args.contains("ReadWriter"))
   }
@@ -99,75 +100,106 @@ class FileParserTest extends munit.FunSuite {
       .getResource("scala-3/implicit-serialization.scala_test")
       .getPath
     val parsedFile = FileParser.fromPathToClassDef(file)
-    
+
     // Should find all classes
     assert(parsedFile.classes.length == 5)
-    
+
     // AchOriginationJobArgs should have implicit ReadWriter
-    val achClass = parsedFile.classes.find(_.name == "AchOriginationJobArgs").get
+    val achClass =
+      parsedFile.classes.find(_.name == "AchOriginationJobArgs").get
     assert(achClass.fields.length == 3)
     assert(achClass.fields(0).name == "cutoff")
     assert(achClass.fields(2).name == "companyName")
-    assert(achClass.fields(2).default.isDefined, "companyName should have default value")
-    // Should have ReadWriter annotation from implicit instance
-    val achReadWriter = achClass.annotations.find(a => 
-      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") && 
-      a.args.contains("ReadWriter")
+    assert(
+      achClass.fields(2).default.isDefined,
+      "companyName should have default value"
     )
-    assert(achReadWriter.isDefined, "AchOriginationJobArgs should have ReadWriter from implicit instance")
-    
+    // Should have ReadWriter annotation from implicit instance
+    val achReadWriter = achClass.annotations.find(a =>
+      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") &&
+        a.args.contains("ReadWriter")
+    )
+    assert(
+      achReadWriter.isDefined,
+      "AchOriginationJobArgs should have ReadWriter from implicit instance"
+    )
+
     // UserWithWriter should have implicit Writer
     val userClass = parsedFile.classes.find(_.name == "UserWithWriter").get
     assert(userClass.fields.length == 2)
-    val userWriter = userClass.annotations.find(a => 
-      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") && 
-      a.args.contains("Writer")
+    val userWriter = userClass.annotations.find(a =>
+      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") &&
+        a.args.contains("Writer")
     )
-    assert(userWriter.isDefined, "UserWithWriter should have Writer from implicit instance")
-    
+    assert(
+      userWriter.isDefined,
+      "UserWithWriter should have Writer from implicit instance"
+    )
+
     // ProductWithReader should have implicit Reader
-    val productClass = parsedFile.classes.find(_.name == "ProductWithReader").get
+    val productClass =
+      parsedFile.classes.find(_.name == "ProductWithReader").get
     assert(productClass.fields.length == 2)
-    val productReader = productClass.annotations.find(a => 
-      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") && 
-      a.args.contains("Reader")
+    val productReader = productClass.annotations.find(a =>
+      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") &&
+        a.args.contains("Reader")
     )
-    assert(productReader.isDefined, "ProductWithReader should have Reader from implicit instance")
-    
+    assert(
+      productReader.isDefined,
+      "ProductWithReader should have Reader from implicit instance"
+    )
+
     // OrderWithReadWriter should have implicit ReadWriter
-    val orderClass = parsedFile.classes.find(_.name == "OrderWithReadWriter").get
+    val orderClass =
+      parsedFile.classes.find(_.name == "OrderWithReadWriter").get
     assert(orderClass.fields.length == 3)
     assert(orderClass.fields(2).name == "status")
-    assert(orderClass.fields(2).default.isDefined, "status should have default value")
-    val orderReadWriter = orderClass.annotations.find(a => 
-      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") && 
-      a.args.contains("ReadWriter")
+    assert(
+      orderClass.fields(2).default.isDefined,
+      "status should have default value"
     )
-    assert(orderReadWriter.isDefined, "OrderWithReadWriter should have ReadWriter from implicit instance")
-    
+    val orderReadWriter = orderClass.annotations.find(a =>
+      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") &&
+        a.args.contains("ReadWriter")
+    )
+    assert(
+      orderReadWriter.isDefined,
+      "OrderWithReadWriter should have ReadWriter from implicit instance"
+    )
+
     // NotSerializable should NOT have any serialization annotation
-    val notSerializableClass = parsedFile.classes.find(_.name == "NotSerializable").get
+    val notSerializableClass =
+      parsedFile.classes.find(_.name == "NotSerializable").get
     assert(notSerializableClass.fields.length == 2)
-    val hasSerialization = notSerializableClass.annotations.exists(a => 
-      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") && 
-      (a.args.contains("ReadWriter") || a.args.contains("Writer") || a.args.contains("Reader"))
+    val hasSerialization = notSerializableClass.annotations.exists(a =>
+      (a.name == "deriving" || a.name == "derives" || a.name == "implicit") &&
+        (a.args.contains("ReadWriter") || a.args.contains("Writer") || a.args
+          .contains("Reader"))
     )
-    assert(!hasSerialization, "NotSerializable should not have any serialization annotation")
+    assert(
+      !hasSerialization,
+      "NotSerializable should not have any serialization annotation"
+    )
   }
 
-  test("parses implicit ReadWriter with qualified type (upickle.default.ReadWriter)") {
+  test(
+    "parses implicit ReadWriter with qualified type (upickle.default.ReadWriter)"
+  ) {
     val file = Thread
       .currentThread()
       .getContextClassLoader
       .getResource("scala-3/implicit-qualified-type.scala_test")
       .getPath
     val parsedFile = FileParser.fromPathToClassDef(file)
-    
+
     val testClass = parsedFile.classes.find(_.name == "TestClass").get
     assert(testClass.fields.length == 1)
-    val readWriter = testClass.annotations.find(a => 
+    val readWriter = testClass.annotations.find(a =>
       a.name == "implicit" && a.args.contains("ReadWriter")
     )
-    assert(readWriter.isDefined, "TestClass should have ReadWriter from implicit instance with qualified type")
+    assert(
+      readWriter.isDefined,
+      "TestClass should have ReadWriter from implicit instance with qualified type"
+    )
   }
 }

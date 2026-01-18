@@ -1,4 +1,4 @@
-import upickle.default._
+import upickle.default.*
 import ujson.Value
 
 object BreakingChangeDetector {
@@ -64,20 +64,20 @@ object BreakingChangeDetector {
       .filter(_.default.isEmpty)
       .map(_.name)
 
-  /**
-   * Check if class has serialization via @deriving or derives (old way)
-   */
+  /** Check if class has serialization via @deriving or derives (old way)
+    */
   private def checkIfClassHasDerivingAnnotation(
       classInfo: ClassInfo,
       initArgs: List[String]
   ): Boolean =
     classInfo.annotations.exists(x =>
-      (x.name == "deriving" || x.name == "derives") && x.args.exists(initArgs.contains)
+      (x.name == "deriving" || x.name == "derives") && x.args.exists(
+        initArgs.contains
+      )
     )
 
-  /**
-   * Check if class has serialization via implicit val instances (new way)
-   */
+  /** Check if class has serialization via implicit val instances (new way)
+    */
   private def checkIfClassHasImplicitSerialization(
       classInfo: ClassInfo,
       serializationTypes: List[String]
@@ -86,9 +86,8 @@ object BreakingChangeDetector {
       x.name == "implicit" && x.args.exists(serializationTypes.contains)
     )
 
-  /**
-   * Check if class has serialization via either old or new way
-   */
+  /** Check if class has serialization via either old or new way
+    */
   private def checkIfClassHasSerialization(
       classInfo: ClassInfo,
       serializationTypes: List[String]
@@ -117,10 +116,11 @@ object BreakingChangeDetector {
     )
     .map(_.name)
 
-  /**
-   * Extract serialization types from annotations (old way: deriving/derives)
-   */
-  private def extractDerivingSerializationTypes(classInfo: ClassInfo): Set[String] = {
+  /** Extract serialization types from annotations (old way: deriving/derives)
+    */
+  private def extractDerivingSerializationTypes(
+      classInfo: ClassInfo
+  ): Set[String] = {
     classInfo.annotations
       .filter(x => x.name == "deriving" || x.name == "derives")
       .flatMap(_.args)
@@ -128,10 +128,11 @@ object BreakingChangeDetector {
       .toSet
   }
 
-  /**
-   * Extract serialization types from implicit annotations (new way)
-   */
-  private def extractImplicitSerializationTypes(classInfo: ClassInfo): Set[String] = {
+  /** Extract serialization types from implicit annotations (new way)
+    */
+  private def extractImplicitSerializationTypes(
+      classInfo: ClassInfo
+  ): Set[String] = {
     classInfo.annotations
       .filter(_.name == "implicit")
       .flatMap(_.args)
@@ -139,16 +140,17 @@ object BreakingChangeDetector {
       .toSet
   }
 
-  /**
-   * Get all serialization types (both old and new ways)
-   */
+  /** Get all serialization types (both old and new ways)
+    */
   private def getAllSerializationTypes(classInfo: ClassInfo): Set[String] = {
-    extractDerivingSerializationTypes(classInfo) ++ extractImplicitSerializationTypes(classInfo)
+    extractDerivingSerializationTypes(
+      classInfo
+    ) ++ extractImplicitSerializationTypes(classInfo)
   }
 
-  /**
-   * Check if serialization was changed (handles both old and new ways, and migration between them)
-   */
+  /** Check if serialization was changed (handles both old and new ways, and
+    * migration between them)
+    */
   private def checkIfSerializationWasChanged(
       oldClass: ClassInfo,
       newClass: ClassInfo

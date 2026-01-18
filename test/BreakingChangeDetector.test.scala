@@ -257,7 +257,9 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     runWithFiles("V10.scala_test", "V10.scala_test.prev")
   }
 
-  test("Should detect breaking change with implicit ReadWriter - added field without default") {
+  test(
+    "Should detect breaking change with implicit ReadWriter - added field without default"
+  ) {
     val oldFile = Thread
       .currentThread()
       .getContextClassLoader
@@ -280,7 +282,9 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     assert(breakingChange.addedFieldsWithoutDefaultValues.contains("email"))
   }
 
-  test("Implicit serialization - adding a field with a default value is not breaking") {
+  test(
+    "Implicit serialization - adding a field with a default value is not breaking"
+  ) {
     val oldFile = Thread
       .currentThread()
       .getContextClassLoader
@@ -324,7 +328,9 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     assert(breakingChange.removedFields.contains("email"))
   }
 
-  test("Implicit serialization - adding implicit instance is not breaking change") {
+  test(
+    "Implicit serialization - adding implicit instance is not breaking change"
+  ) {
     val oldFile = Thread
       .currentThread()
       .getContextClassLoader
@@ -365,7 +371,9 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
       compared.find(_.isBreakingChange).nonEmpty
     )
     val breakingChange = compared.find(_.isBreakingChange).get
-    assert(breakingChange.fieldsWithDefaultValuesThatWasRemoved.contains("theme"))
+    assert(
+      breakingChange.fieldsWithDefaultValuesThatWasRemoved.contains("theme")
+    )
   }
 
   test("Implicit serialization - adding default value is a breaking change") {
@@ -391,7 +399,9 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
     assert(breakingChange.fieldsThatDefaultValueWasAddedToThem.contains("plan"))
   }
 
-  test("Implicit serialization - changing serialization type is a breaking change") {
+  test(
+    "Implicit serialization - changing serialization type is a breaking change"
+  ) {
     def runWithFiles(oldFileName: String, newFileName: String) = {
       val oldFile = Thread
         .currentThread()
@@ -406,7 +416,10 @@ class BreakingChangeDetectorTest extends munit.FunSuite {
         .getPath
       val newFileParsed = FileParser.fromPathToClassDef(newFile)
       val compared =
-        BreakingChangeDetector.detectBreakingChange(oldFileParsed, newFileParsed)
+        BreakingChangeDetector.detectBreakingChange(
+          oldFileParsed,
+          newFileParsed
+        )
       println(compared)
       assert(
         compared.find(_.isBreakingChange).nonEmpty

@@ -1,4 +1,4 @@
-import scala.meta._
+import scala.meta.*
 import scala.meta.Dialect
 
 case class ScalaFile(
@@ -36,16 +36,24 @@ object FileParser {
     }.flatten
   }
 
-  /**
-   * Parse implicit val declarations from the AST.
-   * Returns a map from class name to serialization type (ReadWriter, Writer, Reader, etc.)
-   */
-  private def parseImplicitSerializationInstances(tree: Tree): Map[String, String] = {
+  /** Parse implicit val declarations from the AST. Returns a map from class
+    * name to serialization type (ReadWriter, Writer, Reader, etc.)
+    */
+  private def parseImplicitSerializationInstances(
+      tree: Tree
+  ): Map[String, String] = {
     def extractFromType(tpe: Type): Option[(String, String)] = tpe match {
-      case Type.Apply(Type.Name(serializationType), List(Type.Name(className))) =>
-        Some((className, serializationType))
-      case Type.Apply(Type.Select(_, Type.Name(serializationType)), List(Type.Name(className))) =>
-        Some((className, serializationType))
+      case Type.Apply.After_4_6_0(Type.Name(serializationType), argClause) =>
+        argClause.values.headOption.collect { case Type.Name(className) =>
+          (className, serializationType)
+        }
+      case Type.Apply.After_4_6_0(
+            Type.Select(_, Type.Name(serializationType)),
+            argClause
+          ) =>
+        argClause.values.headOption.collect { case Type.Name(className) =>
+          (className, serializationType)
+        }
       case _ => None
     }
 
@@ -69,24 +77,27 @@ object FileParser {
     }
   }
 
-  /**
-   * Extract annotations from @deriving or derives syntax (old way)
-   */
-  private def extractDerivingAnnotations(classDef: Defn.Class): List[Annotation] = {
+  /** Extract annotations from @deriving or derives syntax (old way)
+    */
+  private def extractDerivingAnnotations(
+      classDef: Defn.Class
+  ): List[Annotation] = {
     val derivingFromAnnotation =
       classDef.mods
         .flatMap(_.children)
-        .collect { case Init(tpe, _, args) =>
-          Annotation(tpe.toString, args.flatten.map(_.toString))
+        .collect { case Init.After_4_6_0(tpe, _, argClauses) =>
+          Annotation(
+            tpe.toString,
+            argClauses.flatMap(_.values).map(_.toString).toList
+          )
         }
     val derivingFromDerives =
       classDef.templ.derives.map(d => Annotation("derives", List(d.toString)))
     derivingFromAnnotation ++ derivingFromDerives
   }
 
-  /**
-   * Extract annotations from implicit val instances (new way)
-   */
+  /** Extract annotations from implicit val instances (new way)
+    */
   private def extractImplicitSerializationAnnotations(
       className: String,
       implicitInstances: Map[String, String]
@@ -99,7 +110,7 @@ object FileParser {
 
   def parse(
       content: String,
-      dialect: Dialect = dialects.Scala213Source3
+      dialect: Dialect = dialects.Scala3
   ): ScalaFile = {
     val input = Input.String(content)
     val exampleTree: Source = dialect(input).parse[Source].get
@@ -112,16 +123,22 @@ object FileParser {
       parseTreeClasses(exampleTree)
         .map(c => {
           val derivingAnnotations = extractDerivingAnnotations(c)
-          val implicitAnnotations = extractImplicitSerializationAnnotations(c.name.value, implicitInstances)
+          val implicitAnnotations = extractImplicitSerializationAnnotations(
+            c.name.value,
+            implicitInstances
+          )
           ClassInfo(
             c.name.value,
-            c.ctor.paramss.headOption.getOrElse(Nil).map(p =>
-              Field(
-                p.name.value,
-                p.decltpe.get.toString,
-                p.default.map(_.toString)
-              )
-            ),
+            c.ctor.paramClauses.headOption
+              .map(_.values)
+              .getOrElse(Nil)
+              .map(p =>
+                Field(
+                  p.name.value,
+                  p.decltpe.get.toString,
+                  p.default.map(_.toString)
+                )
+              ),
             derivingAnnotations ++ implicitAnnotations
           )
         })
