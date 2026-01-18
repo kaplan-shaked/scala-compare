@@ -1,4 +1,4 @@
-import upickle.default._
+import upickle.default.*
 import ujson.Value
 
 object BreakingChangeDetector {
@@ -18,7 +18,7 @@ object BreakingChangeDetector {
   }
 
   object CompareSummary {
-    implicit val rw: ReadWriter[CompareSummary] = macroRW
+    given ReadWriter[CompareSummary] = ReadWriter.derived[CompareSummary]
   }
   val serializableClasses =
     List("Reader", "Writer", "ResourceReader", "ResourceWriter", "ReadWriter")

@@ -1,4 +1,4 @@
-import scala.meta._
+import scala.meta.*
 import scala.meta.Dialect
 
 case class ScalaFile(
@@ -99,7 +99,7 @@ object FileParser {
 
   def parse(
       content: String,
-      dialect: Dialect = dialects.Scala213Source3
+      dialect: Dialect = dialects.Scala3
   ): ScalaFile = {
     val input = Input.String(content)
     val exampleTree: Source = dialect(input).parse[Source].get
