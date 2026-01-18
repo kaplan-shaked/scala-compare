@@ -1,9 +1,9 @@
 // receive 2 file paths as input and compare the files, exit with status code 0 if there was no breaking change, 1 otherwise
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
-import BreakingChangeDetector._
-import BreakingChangeDetector.CompareSummary._
-import upickle.default._
+import BreakingChangeDetector.*
+import BreakingChangeDetector.CompareSummary.*
+import upickle.default.*
 
 object CompareApp {
   implicit val compareSummaryRw: ReadWriter[CompareSummary] = rw

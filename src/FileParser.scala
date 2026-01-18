@@ -43,16 +43,17 @@ object FileParser {
       tree: Tree
   ): Map[String, String] = {
     def extractFromType(tpe: Type): Option[(String, String)] = tpe match {
-      case Type.Apply(
-            Type.Name(serializationType),
-            List(Type.Name(className))
-          ) =>
-        Some((className, serializationType))
-      case Type.Apply(
+      case Type.Apply.After_4_6_0(Type.Name(serializationType), argClause) =>
+        argClause.values.headOption.collect { case Type.Name(className) =>
+          (className, serializationType)
+        }
+      case Type.Apply.After_4_6_0(
             Type.Select(_, Type.Name(serializationType)),
-            List(Type.Name(className))
+            argClause
           ) =>
-        Some((className, serializationType))
+        argClause.values.headOption.collect { case Type.Name(className) =>
+          (className, serializationType)
+        }
       case _ => None
     }
 
@@ -84,8 +85,11 @@ object FileParser {
     val derivingFromAnnotation =
       classDef.mods
         .flatMap(_.children)
-        .collect { case Init(tpe, _, args) =>
-          Annotation(tpe.toString, args.flatMap(_.values).map(_.toString))
+        .collect { case Init.After_4_6_0(tpe, _, argClauses) =>
+          Annotation(
+            tpe.toString,
+            argClauses.flatMap(_.values).map(_.toString).toList
+          )
         }
     val derivingFromDerives =
       classDef.templ.derives.map(d => Annotation("derives", List(d.toString)))
@@ -125,7 +129,8 @@ object FileParser {
           )
           ClassInfo(
             c.name.value,
-            c.ctor.paramss.headOption
+            c.ctor.paramClauses.headOption
+              .map(_.values)
               .getOrElse(Nil)
               .map(p =>
                 Field(
