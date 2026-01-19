@@ -46,7 +46,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: make image avaiable
+        run: |
+          docker pull openjdk:17.0.2-slim
+          docker tag openjdk:17.0.2-slim openjdk:17-slim
       # publish to GitHub Container Registry
+      - name: Build
+        run: |
+          scala-cli --power package --docker . --docker-image-repository ghcr.io/${{ github.repository }}
       - name: Publish
         run: |
           docker push ghcr.io/${{ github.repository }}:latest
