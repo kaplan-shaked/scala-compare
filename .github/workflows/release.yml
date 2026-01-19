@@ -1,7 +1,7 @@
 name: Docker build & publish
 permissions:
-    contents: read
-    packages: write
+  contents: read
+  packages: write
 
 on:
   push:
@@ -10,8 +10,6 @@ on:
 
 jobs:
   build:
-  
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +27,7 @@ jobs:
       # Build JAR using scala-cli
       - name: Build JAR
         run: |
-          scala-cli --power package --assembly -o scala-compare.jar .
+          scala-cli --power package --assembly --scala 3.7.1 -o scala-compare.jar .
       # Build and push Docker image
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
