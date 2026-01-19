@@ -22,6 +22,7 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
       - uses: coursier/cache-action@v6
       - uses: VirtusLab/scala-cli-setup@main
       # Build JAR using scala-cli
