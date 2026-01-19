@@ -44,7 +44,8 @@ jobs:
       - name: make image avaiable
         run: |
           docker pull openjdk:17.0.2-slim
-          docker tag openjdk:17.0.2-slim openjdk:17-slim
+      - name: docker tag
+        run: docker tag openjdk:17.0.2-slim openjdk:17-slim
       # publish to GitHub Container Registry
       - name: Build
         run: |
