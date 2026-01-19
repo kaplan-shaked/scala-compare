@@ -24,8 +24,6 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
-      - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
       - uses: coursier/cache-action@v6
       - uses: VirtusLab/scala-cli-setup@main
       # Build JAR using scala-cli
